@@ -50,7 +50,7 @@ def train(device, train_loader, model, classifier, criterion, optimizer, scaler,
         
     return sum_ce_loss, sum_metric_loss, sum_loss, count
 
-def test(device, test_loader, model):
+def test(device, test_loader, model, classifier):
     model.eval()
     criterion = torch.nn.CrossEntropyLoss()
     sum_loss = 0.0
@@ -61,10 +61,12 @@ def test(device, test_loader, model):
             img = img.to(device, non_blocking=True).float()
             label = label.to(device, non_blocking=True).long()
             
-            logit = model(img)
-            loss = criterion(logit, label)
+            features = model(img)
+            logit = classifier(features)
             
-            sum_loss += loss.item()
+            ce_loss = criterion(logit, label)
+            
+            sum_loss += ce_loss.item()
             count += torch.sum(logit.argmax(dim=1) == label).item()
 
     return sum_loss, count

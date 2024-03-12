@@ -76,7 +76,7 @@ def main(args):
 
     for epoch in range(args.epoch):
         ce_loss, metric_loss, train_loss, train_count = trainer.train(device, train_loader, model, classifier, criterion, optimizer, scaler, use_amp, epoch, method)
-        test_loss, test_count = trainer.test(device, test_loader, model)
+        test_loss, test_count = trainer.test(device, test_loader, model, classifier)
 
         ce_loss = (ce_loss/len(train_loader))
         metric_loss = (metric_loss/len(train_loader))
