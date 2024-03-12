@@ -1,4 +1,5 @@
-# Metric Learningのサンプルプログラム
+# Metric_Learning_Sample
+Metric Learningのサンプルプログラム
 
 ## 動作環境
 <details>
