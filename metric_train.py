@@ -61,13 +61,14 @@ def main(args):
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=8, pin_memory=True, drop_last=True)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=8, pin_memory=True, drop_last=False)
 
-    model = create_model("resnet18", pretrained=True, num_classes=0) 
+    model = create_model("resnet18", pretrained=True) 
     # model = create_model("resnet34", pretrained=True, num_classes=0) 
     # model = create_model("resnet50", pretrained=True, num_classes=0) 
     # model = create_model("resnet101", pretrained=True, num_classes=0)
     # model = create_model("resnet152", pretrained=True, num_classes=0)  
+    model.fc = torch.nn.Identity()
     model.to('cuda')
-
+    
     classifier = nn.Linear(512, len(class_names))
     classifier.to('cuda')
 

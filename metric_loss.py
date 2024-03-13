@@ -92,7 +92,7 @@ def triplet_loss(embeddings, margin, squared=False):
     return triplet_loss
 
 
-def batch_hard_triplet_loss(label, embeddings, margin, squared=False):
+def batch_hard_triplet_loss(embeddings, label, margin, squared=False):
 
     pairwise_dist = _pairwise_distances(embeddings, squared=squared)
     mask_anchor_positive = _get_anchor_positive_triplet_mask(label).float()
@@ -112,7 +112,7 @@ def batch_hard_triplet_loss(label, embeddings, margin, squared=False):
     return triplet_loss
 
 
-def batch_all_triplet_loss(label, embeddings, margin, _, __, squared=False):
+def batch_all_triplet_loss(embeddings, label, margin, squared=False):
 
     pairwise_dist = _pairwise_distances(embeddings, squared=squared)
 
