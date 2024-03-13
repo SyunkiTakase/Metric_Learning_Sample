@@ -5,9 +5,6 @@ Metric Learningのサンプルコード
 <details>
 <summary>ライブラリのバージョン</summary>
  
-* Ubuntu 18.04
-* Geforce RTX 4090
-* driver 530.30.02
 * cuda 12.1
 * python 3.6.9
 * torch 1.8.1+cu111
@@ -54,16 +51,20 @@ Metric Learningのサンプルコード
 
 <details>
 <summary>Metric Learningを導入したResNetのファインチューニング(CIFAR-10)</summary>
- 
+
+Siamese Networkの学習 
 ```
 python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --method Siamese
 ```
+Triplet Lossの学習
 ```
 python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --method Triplet
 ```
+Triplet Mining(Batch Hard Strategy)の学習
 ```
 python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --method Hard
 ```
+Triplet Mining(Batch All Strategy)の学習
 ```
 python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --method All
 ```
@@ -71,16 +72,20 @@ python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --me
 
 <details>
 <summary>Metric Learningを導入したResNetのファインチューニング(CIFAR-100)</summary>
- 
+
+Siamese Networkの学習 
 ```
 python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --method Siamese
 ```
+Triplet Lossの学習
 ```
 python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --method Triplet
 ```
+Triplet Mining(Batch Hard Strategy)の学習
 ```
 python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --method Hard
 ```
+Triplet Mining(Batch All Strategy)の学習
 ```
 python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --method All
 ```
