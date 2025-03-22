@@ -2,14 +2,15 @@ import torch
 import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
-from functools import partial
-from time import time
-from tqdm import tqdm
+
 import numpy as np
 from PIL import Image
-from metric_loss import contrastive_loss, triplet_loss, batch_hard_triplet_loss, batch_all_triplet_loss
+from time import time
+from tqdm import tqdm
 
-def train(device, train_loader, model, classifier, criterion, optimizer, scaler, use_amp, epoch, method):
+from functools import partial
+
+def train(device, train_loader, model, classifier, optimizer, scaler, use_amp, epoch, criterion, metric):
     model.train()
     
     sum_ce_loss = 0.0
@@ -26,16 +27,8 @@ def train(device, train_loader, model, classifier, criterion, optimizer, scaler,
             features = model(img)
             logit = classifier(features)
 
-            if method =='Siamese':
-                metric_loss = contrastive_loss(features, label, margin)
-            elif method =='Triplet':
-                metric_loss = triplet_loss(features, label, margin)
-            elif method =='Hard':
-                metric_loss = batch_hard_triplet_loss(features, label, margin)
-            elif method =='All':
-                metric_loss = batch_all_triplet_loss(features, label, margin)
-            
             ce_loss = criterion(logit, label)
+            metric_loss = metric(features, label, margin)            
             loss = ce_loss + metric_loss
             
         optimizer.zero_grad()
@@ -50,9 +43,8 @@ def train(device, train_loader, model, classifier, criterion, optimizer, scaler,
         
     return sum_ce_loss, sum_metric_loss, sum_loss, count
 
-def test(device, test_loader, model, classifier):
+def test(device, test_loader, model, classifier, criterion):
     model.eval()
-    criterion = torch.nn.CrossEntropyLoss()
     sum_loss = 0.0
     count = 0
 

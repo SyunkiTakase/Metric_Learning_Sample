@@ -3,14 +3,15 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 
-from functools import partial
+import os
+import argparse
+import numpy as np
 from time import time
 from tqdm import tqdm
-import argparse
+from functools import partial
+
 import trainer
-import make_graph
-import numpy as np
-import os
+from metric_loss import ContrastiveLoss, TripletLoss
 
 import timm
 from timm.models import create_model
@@ -26,65 +27,79 @@ save_path = './model/'
 s = time()
 
 def main(args):
+    
+    num_epoch = args.epoch
+    batch_size = args.batch_size
+    lr = args.lr
+    img_size = args.img_size
+    dataset_name = args.dataset
+    margin = args.margin
     use_amp = args.amp
     method = args.method
+    use_hard_triplets = args.hard_triplets
 
     mean = [0.4914, 0.4822, 0.4465]
     std = [0.2023, 0.1994, 0.2010]
 
     train_transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.RandomCrop(32, padding=4),
+        transforms.RandomCrop(img_size, padding=4),
         transforms.RandomHorizontalFlip(),
-        transforms.Resize((224,224)),
+        transforms.Resize((img_size, img_size)),
         transforms.Normalize(mean, std),
     ])
     test_transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Resize((224,224)),
+        transforms.Resize((img_size, img_size)),
         transforms.Normalize(mean, std),
     ])
     
-    if args.dataset == 'cifar10':
+    if dataset_name == 'cifar10':
         train_dataset = torchvision.datasets.CIFAR10("./data", train=True, transform=train_transform, download=True)
         test_dataset = torchvision.datasets.CIFAR10("./data", train=False, transform=test_transform, download=False)
 
-    elif args.dataset == 'cifar100':
+    elif dataset_name == 'cifar100':
         train_dataset = torchvision.datasets.CIFAR100("./data", train=True, transform=train_transform, download=True)
         test_dataset = torchvision.datasets.CIFAR100("./data", train=False, transform=test_transform, download=False)
 
     class_names = train_dataset.classes        
     print(class_names)
     print('Class:', len(class_names))
-    criterion = torch.nn.CrossEntropyLoss()
 
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=8, pin_memory=True, drop_last=True)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=8, pin_memory=True, drop_last=False)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=8, pin_memory=True, drop_last=True)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True, drop_last=False)
 
-    model = create_model("resnet18", pretrained=True) 
-    # model = create_model("resnet34", pretrained=True, num_classes=0) 
-    # model = create_model("resnet50", pretrained=True, num_classes=0) 
-    # model = create_model("resnet101", pretrained=True, num_classes=0)
-    # model = create_model("resnet152", pretrained=True, num_classes=0)  
+    model = create_model("resnet18", pretrained=False, num_classes=0) 
+    # model = create_model("resnet34", pretrained=False, num_classes=0) 
+    # model = create_model("resnet50", pretrained=False, num_classes=0) 
+    # model = create_model("resnet101", pretrained=False, num_classes=0)
+    # model = create_model("resnet152", pretrained=False, num_classes=0)  
     model.fc = torch.nn.Identity()
     model.to('cuda')
     
     classifier = nn.Linear(512, len(class_names))
     classifier.to('cuda')
 
-    optimizer = torch.optim.Adam([{'params':model.parameters()},{'params':classifier.parameters()}], lr=args.lr)
+    criterion = torch.nn.CrossEntropyLoss()
+
+    if method == 'contrastive':
+        metric = ContrastiveLoss(margin=margin) # 損失関数
+    elif method == 'triplet':
+        metric = TripletLoss(margin=margin, hard_triplets=use_hard_triplets) # 損失関数
+
+    optimizer = torch.optim.Adam([{'params':model.parameters()}, {'params':classifier.parameters()}], lr=lr)
     scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
 
-    for epoch in range(args.epoch):
-        ce_loss, metric_loss, train_loss, train_count = trainer.train(device, train_loader, model, classifier, criterion, optimizer, scaler, use_amp, epoch, method)
-        test_loss, test_count = trainer.test(device, test_loader, model, classifier)
+    for epoch in range(num_epoch):
+        ce_loss, metric_loss, train_loss, train_count = trainer.train(device, train_loader, model, classifier, optimizer, scaler, use_amp, epoch, criterion, metric)
+        test_loss, test_count = trainer.test(device, test_loader, model, classifier, criterion)
 
-        ce_loss = (ce_loss/len(train_loader))
-        metric_loss = (metric_loss/len(train_loader))
-        train_loss = (train_loss/len(train_loader))
-        train_acc = (train_count/len(train_loader.dataset))
-        test_loss = (test_loss/len(test_loader))
-        test_acc = (test_count/len(test_loader.dataset))
+        ce_loss = (ce_loss / len(train_loader))
+        metric_loss = (metric_loss / len(train_loader))
+        train_loss = (train_loss / len(train_loader))
+        train_acc = (train_count / len(train_loader.dataset))
+        test_loss = (test_loss / len(test_loader))
+        test_acc = (test_count / len(test_loader.dataset))
 
         print(f"epoch: {epoch+1},\
                 train loss: {train_loss},\
@@ -99,18 +114,8 @@ def main(args):
         test_losses.append(test_loss)
         test_accs.append(test_acc)
 
-        save_model_path = os.path.join(save_path + 'weights/',"{}.tar".format(epoch + 1))
-        torch.save({
-                "model":model.state_dict(),
-                "optimizer":optimizer.state_dict(),
-                "epoch":epoch
-            },save_model_path)
-        
-        make_graph.draw_loss_graph(train_losses, test_losses)
-        make_graph.draw_acc_graph(train_accs,test_accs)
-
     e = time()
-    print('Elapsed time is ',e-s)
+    print('Elapsed time is ', e-s)
 
 if __name__=='__main__':
 
@@ -118,8 +123,11 @@ if __name__=='__main__':
     parser.add_argument('--epoch', type=int, default=10)
     parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument("--lr", type=int, default=1e-3)
-    parser.add_argument("--dataset", type=str, default="cifar10")
+    parser.add_argument("--img_size", type=int, default=32)
+    parser.add_argument("--dataset", type=str, choices=['cifar10', 'cifar100'], default="cifar10")
+    parser.add_argument("--margin", type=int, default=10)
     parser.add_argument('--amp', action='store_true')
-    parser.add_argument("--method", type=str, choices=['Siamese', 'Triplet', 'Hard', 'All'], default="Siamese")
+    parser.add_argument("--method", type=str, choices=['Siamese', 'Triplet'], default="Siamese")
+    parser.add_argument("--hard_triplets", action='store_true')
     args=parser.parse_args()
     main(args)
