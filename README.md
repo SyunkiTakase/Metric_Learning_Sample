@@ -62,11 +62,7 @@ python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --me
 ```
 Triplet Mining(Batch Hard Strategy)の学習
 ```
-python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --method Hard
-```
-Triplet Mining(Batch All Strategy)の学習
-```
-python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --method All
+python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --method Triplet --hard_triplets
 ```
 </details>
 
@@ -83,11 +79,7 @@ python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --m
 ```
 Triplet Mining(Batch Hard Strategy)の学習
 ```
-python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --method Hard
-```
-Triplet Mining(Batch All Strategy)の学習
-```
-python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --method All
+python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --method Triplet --hard_triplets
 ```
 </details>
 
@@ -99,7 +91,7 @@ python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --m
     * Siamese Neural Networks for One-shot Image Recognition
   * Triplet Loss
     * Learning Fine-grained Image Similarity with Deep Ranking
-  * Triplet Mining(Batch All Strategy，Batch Hard Strategy)
+  * Triplet Mining
     * FaceNet: A Unified Embedding for Face Recognition and Clustering
 
 * 参考にしたリポジトリ 
@@ -109,5 +101,5 @@ python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --m
     * https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/resnet.py
   * Siamese Network，Triplet Loss
     * https://github.com/adambielski/siamese-triplet
-  * Triplet Mining(Batch All Strategy，Batch Hard Strategy)
+  * Triplet Mining
     * https://github.com/NegatioN/OnlineMiningTripletLoss
