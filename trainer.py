@@ -17,7 +17,6 @@ def train(device, train_loader, model, classifier, optimizer, scaler, use_amp, e
     sum_metric_loss = 0.0
     sum_loss = 0.0
     count = 0
-    margin = 0.2
 
     for img,label in tqdm(train_loader):
         img = img.to(device, non_blocking=True).float()
@@ -28,7 +27,7 @@ def train(device, train_loader, model, classifier, optimizer, scaler, use_amp, e
             logit = classifier(features)
 
             ce_loss = criterion(logit, label)
-            metric_loss = metric(features, label, margin)            
+            metric_loss = metric(features, label)            
             loss = ce_loss + metric_loss
             
         optimizer.zero_grad()

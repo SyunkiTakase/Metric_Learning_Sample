@@ -74,7 +74,6 @@ def main(args):
     # model = create_model("resnet50", pretrained=False, num_classes=0) 
     # model = create_model("resnet101", pretrained=False, num_classes=0)
     # model = create_model("resnet152", pretrained=False, num_classes=0)  
-    model.fc = torch.nn.Identity()
     model.to('cuda')
     
     classifier = nn.Linear(512, len(class_names))
@@ -86,7 +85,7 @@ def main(args):
         metric = ContrastiveLoss(margin=margin) # 損失関数
     elif method == 'triplet':
         metric = TripletLoss(margin=margin, hard_triplets=use_hard_triplets) # 損失関数
-
+    print('metric:', metric)
     optimizer = torch.optim.Adam([{'params':model.parameters()}, {'params':classifier.parameters()}], lr=lr)
     scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
 
@@ -121,13 +120,13 @@ if __name__=='__main__':
 
     parser=argparse.ArgumentParser()
     parser.add_argument('--epoch', type=int, default=10)
-    parser.add_argument('--batch_size', type=int, default=32)
+    parser.add_argument('--batch_size', type=int, default=128)
     parser.add_argument("--lr", type=int, default=1e-3)
     parser.add_argument("--img_size", type=int, default=32)
     parser.add_argument("--dataset", type=str, choices=['cifar10', 'cifar100'], default="cifar10")
     parser.add_argument("--margin", type=int, default=10)
     parser.add_argument('--amp', action='store_true')
-    parser.add_argument("--method", type=str, choices=['Siamese', 'Triplet'], default="Siamese")
+    parser.add_argument("--method", type=str, choices=['contrastive', 'triplet'], default="contrastive")
     parser.add_argument("--hard_triplets", action='store_true')
     args=parser.parse_args()
     main(args)

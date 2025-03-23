@@ -42,7 +42,7 @@ class ContrastiveLoss(nn.Module):
 
 # Triplet Loss
 class TripletLoss(nn.Module):
-    def __init__(self, margin=1.0, hard_triplets=True):
+    def __init__(self, margin=1.0, hard_triplets=False):
         """
         Args:
             margin (float): マージン値
