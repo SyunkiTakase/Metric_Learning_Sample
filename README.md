@@ -37,7 +37,7 @@ Metric Learningのサンプルコード
 |metric_train.py|Metric Learningを導入したResNetを学習するコード．|
 |trainer.py|学習ループのコード．|
 |metric_loss.py|Metric Learningの損失のコード．|
-|make_graph.py|学習曲線を可視化するコード．|
+<!-- |make_graph.py|学習曲線を可視化するコード．| -->
 </details>
 
 ## 実行手順
