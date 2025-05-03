@@ -34,7 +34,7 @@ Metric Learningのサンプルコード
  
 |ファイル名|説明|
 |----|----|
-|metric_train.py|Metric Learningを導入したResNetを学習するコード．|
+|train_metric.py|Metric Learningを導入したResNetを学習するコード．|
 |trainer.py|学習ループのコード．|
 |metric_loss.py|Metric Learningの損失のコード．|
 <!-- |make_graph.py|学習曲線を可視化するコード．| -->
@@ -54,15 +54,15 @@ Metric Learningのサンプルコード
 
 Siamese Networkの学習 
 ```
-python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --method contrastive
+python3 train_metric.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --method contrastive
 ```
 Triplet Lossの学習
 ```
-python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --method triplet
+python3 train_metric.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --method triplet
 ```
 Triplet Mining(Batch Hard Strategy)の学習
 ```
-python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --method triplet --hard_triplets
+python3 train_metric.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --method triplet --hard_triplets
 ```
 </details>
 
@@ -71,15 +71,15 @@ python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar10 --me
 
 Siamese Networkの学習 
 ```
-python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --method contrastive
+python3 train_metric.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --method contrastive
 ```
 Triplet Lossの学習
 ```
-python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --method triplet
+python3 train_metric.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --method triplet
 ```
 Triplet Mining(Batch Hard Strategy)の学習
 ```
-python3 metric_train.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --method triplet --hard_triplets
+python3 train_metric.py --epoch 10 --batch_size 128 --amp --dataset cifar100 --method triplet --hard_triplets
 ```
 </details>
 

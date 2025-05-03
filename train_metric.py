@@ -1,8 +1,3 @@
-import torch
-import torch.nn as nn
-import torchvision
-import torchvision.transforms as transforms
-
 import os
 import argparse
 import numpy as np
@@ -10,11 +5,16 @@ from time import time
 from tqdm import tqdm
 from functools import partial
 
-import trainer
-from metric_loss import ContrastiveLoss, TripletLoss
+import torch
+import torch.nn as nn
+import torchvision
+import torchvision.transforms as transforms
 
 import timm
 from timm.models import create_model
+
+import trainer
+from metric_loss import ContrastiveLoss, TripletLoss
 
 device = torch.device("cuda")
 

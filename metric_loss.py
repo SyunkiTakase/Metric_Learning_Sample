@@ -33,7 +33,7 @@ class ContrastiveLoss(nn.Module):
             return torch.tensor(0.0)
 
         # Contrastive Loss
-        loss = 0.5 * (
+        loss = (
             (positive_dist.pow(2) / 2).mean() +  
             (F.relu(self.margin - negative_dist + 1e-9).pow(2) / 2).mean() 
         )
