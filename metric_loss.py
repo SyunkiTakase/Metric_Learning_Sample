@@ -26,8 +26,8 @@ class ContrastiveLoss(nn.Module):
         negative_dist = pairwise_dist * negative_mask
 
         # 各ペアの数をカウント
-        num_pos_pairs = len(positive_dist)
-        num_neg_pairs = len(negative_dist)
+        num_pos_pairs = positive_mask.sum().item()
+        num_neg_pairs = negative_mask.sum().item()
 
         if num_pos_pairs == 0 or num_neg_pairs == 0:
             return torch.tensor(0.0)
@@ -54,7 +54,7 @@ class TripletLoss(nn.Module):
 
     def forward(self, embeddings, labels):
         # 特徴量間のペアワイズ距離の計算
-        pairwise_dist = torch.cdist(embeddings, embeddings, p=2) # [2 * batch, 2 * batch]
+        pairwise_dist = torch.cdist(embeddings, embeddings, p=2)
 
         positive_mask = (labels.unsqueeze(1) == labels.unsqueeze(0)).float() # 同じラベルのマスク（ポジティブ）
         negative_mask = (labels.unsqueeze(1) != labels.unsqueeze(0)).float() # 異なるラベルのマスク（ネガティブ）
@@ -63,6 +63,7 @@ class TripletLoss(nn.Module):
 
         if self.use_hard_triplets: # Hard PositiveおよびHard Negativeを選択
             positive_dist = pairwise_dist * positive_mask
+            positive_dist = positive_dist + (1 - positive_mask) * -1e6
             hardest_positive_dist, _ = positive_dist.max(dim=1) # 各アンカーに対する最も遠いポジティブ
 
             negative_dist = pairwise_dist + (1 - negative_mask) * 1e6 # 無効なネガティブに大きな値を設定

@@ -12,13 +12,14 @@ from functools import partial
 
 def train(device, train_loader, model, classifier, optimizer, scaler, use_amp, epoch, criterion, metric):
     model.train()
+    classifier.train()
     
     sum_ce_loss = 0.0
     sum_metric_loss = 0.0
     sum_loss = 0.0
     count = 0
 
-    for img,label in tqdm(train_loader):
+    for img, label in tqdm(train_loader):
         img = img.to(device, non_blocking=True).float()
         label = label.to(device, non_blocking=True).long()
 
@@ -28,6 +29,7 @@ def train(device, train_loader, model, classifier, optimizer, scaler, use_amp, e
 
             ce_loss = criterion(logit, label)
             metric_loss = metric(features, label)            
+            # metric_loss = 0.2 * metric(features, label) # Hard Miningの時はこちらを使用
             loss = ce_loss + metric_loss
             
         optimizer.zero_grad()
@@ -44,6 +46,8 @@ def train(device, train_loader, model, classifier, optimizer, scaler, use_amp, e
 
 def test(device, test_loader, model, classifier, criterion):
     model.eval()
+    classifier.eval()
+    
     sum_loss = 0.0
     count = 0
 

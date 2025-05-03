@@ -75,17 +75,15 @@ def main(args):
     # model = create_model("resnet101", pretrained=False, num_classes=0)
     # model = create_model("resnet152", pretrained=False, num_classes=0)  
     model.to('cuda')
-    
     classifier = nn.Linear(512, len(class_names))
     classifier.to('cuda')
 
     criterion = torch.nn.CrossEntropyLoss()
-
     if method == 'contrastive':
         metric = ContrastiveLoss(margin=margin) # 損失関数
     elif method == 'triplet':
         metric = TripletLoss(margin=margin, hard_triplets=use_hard_triplets) # 損失関数
-    print('metric:', metric)
+
     optimizer = torch.optim.Adam([{'params':model.parameters()}, {'params':classifier.parameters()}], lr=lr)
     scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
 
