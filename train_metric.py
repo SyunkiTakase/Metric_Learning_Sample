@@ -119,7 +119,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser()
     parser.add_argument('--epoch', type=int, default=10)
     parser.add_argument('--batch_size', type=int, default=128)
-    parser.add_argument("--lr", type=int, default=1e-3)
+    parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--img_size", type=int, default=32)
     parser.add_argument("--dataset", type=str, choices=['cifar10', 'cifar100'], default="cifar10")
     parser.add_argument("--margin", type=int, default=10)
